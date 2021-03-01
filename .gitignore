@@ -1,0 +1,28 @@
+dist/
+/*/lib/
+/*/typescript/lib/
+app/lib/
+packages/*/lib/
+plugins/
+
+src-gen/
+css-gen/
+node_modules/
+yarn-error.log
+lerna-debug.log
+telepresence.log
+.env
+.tmp
+.sass-cache
+
+.npmrc
+.context
+.npm-packages-offline-cache
+*.tgz
+
+# Symbolic links created by scripts for building docker images
+/.dockerignore
+
+# Generated
+app/gen-webpack.config.js
+
