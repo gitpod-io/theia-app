@@ -12,7 +12,8 @@
         "lerna": "^2.11.0",
         "rimraf": "^2.6.2",
         "ts-node": "<7.0.0",
-        "typescript": "^3.9.3"
+        "typescript": "^3.9.3",
+        "patch-package": "^6.2.2"
     },
     "scripts": {
         "build": "lerna run build",
