@@ -311,6 +311,7 @@ export class GitpodPluginDeployer implements GitpodPluginService {
             requestretry({
                 url,
                 method: 'GET',
+                headers: { 'Content-Type': '*/*' },
                 // if we cannot establish connection in 5s then try again in 2s 5 times
                 // if we cannot read then timeout in 5s
                 maxAttempts: 5,
@@ -349,30 +350,35 @@ export class GitpodPluginDeployer implements GitpodPluginService {
         }
         const stat = await fs.stat(FileUri.fsPath(fileUri));
 
-        const upload = new Promise<void>((resolve, reject) =>
-            fs.createReadStream(FileUri.fsPath(fileUri))
-                .pipe(request.put({
-                    url: targetUrl,
-                    headers: {
-                        'Content-Length': stat.size
+        // read file content instead of pipe stream to survive redirect
+        const fileContent = fs.readFileSync(FileUri.fsPath(fileUri));
+
+        const upload = new Promise<void>((resolve, reject) => {
+            request.put({
+                url: targetUrl,
+                followAllRedirects: true,
+                followOriginalHttpMethod: true,
+                headers: {
+                    'Content-Type': '*/*',
+                    'Content-Length': stat.size
+                },
+                body: fileContent
+            }, (err, response) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                if (response && response.statusCode !== 200) {
+                    if (response.statusCode === 400) {
+                        console.error("Bad Request: /plugin returned with code 400.", err);
                     }
-                }, (err, response) => {
-                    if (err) {
-                        reject(err);
-                        return;
-                    }
-                    if (response && response.statusCode !== 200) {
-                        if (response.statusCode === 400) {
-                            console.error("Bad Request: /plugin returned with code 400.", err);
-                        }
-                        reject(new Error(response.statusMessage));
-                        return;
-                    }
-                    resolve(undefined);
-                }))
-                .on('error', reject)
-                .on('close', () => resolve(undefined))
-        );
+                    reject(new Error(response.statusMessage + " - " + response.body));
+                    return;
+                }
+                resolve(undefined);
+            });
+        });
+
         try {
             // first try to upload ...
             await upload;
