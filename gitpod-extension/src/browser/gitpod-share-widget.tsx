@@ -181,7 +181,7 @@ export class GitpodShareDialog extends AbstractDialog<boolean> {
     protected appendContent() {
         const messageNode = document.createElement("div");
         messageNode.setAttribute('style', 'max-width: 30vw; padding-bottom: 1em');
-        messageNode.innerHTML = "<p><b>Warning:</b> Sharing your workspace with others also means sharing your access to your repository. Everyone with access to the workspace you share can commit in your name.</p>";
+        messageNode.innerHTML = "<p><b>Warning:</b> Sharing your workspace with others also means sharing your access to your GitHub/GitLab/BitBucket account. Everyone with access to the workspace you share can commit in your name.</p>";
         this.contentNode.appendChild(messageNode);
 
         const enableSharingPanel = document.createElement("div");
